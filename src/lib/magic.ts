@@ -34,7 +34,7 @@ export async function getWalletAddress(): Promise<string | null> {
   try {
     const magic = getMagic();
     const info = await magic.user.getInfo();
-    return info.publicAddress || null;
+    return info.wallets?.ethereum?.publicAddress || null;
   } catch {
     return null;
   }

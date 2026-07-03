@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useAuth } from "@/components/MagicAuthProvider";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -10,22 +11,28 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getMagic } from "@/lib/magic";
+import { toast } from "sonner";
 
 export function MagicLoginButton() {
   const { address, isAuthenticated, isLoading, refresh, logout } = useAuth();
+  const [loggingIn, setLoggingIn] = useState(false);
 
   const handleGoogleLogin = async () => {
+    setLoggingIn(true);
     try {
       const magic = getMagic();
       await magic.wallet.connectWithUI();
-      await refresh();
     } catch (e) {
-      console.error("Login failed:", e);
+      console.error("Login attempt error:", e);
     }
+    // Wait for Magic's internal state to settle
+    await new Promise((r) => setTimeout(r, 1500));
+    await refresh();
+    setLoggingIn(false);
   };
 
-  if (isLoading) {
-    return <Button variant="outline" disabled>Loading...</Button>;
+  if (isLoading || loggingIn) {
+    return <Button variant="outline" disabled>{loggingIn ? "Connecting..." : "Loading..."}</Button>;
   }
 
   if (isAuthenticated && address) {
