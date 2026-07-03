@@ -1,12 +1,33 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useAuth } from "@/components/MagicAuthProvider";
 import { MagicLoginButton } from "@/components/MagicLoginButton";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
+import type { Product } from "@/types";
 
 export default function MerchantDashboard() {
-  const { isAuthenticated } = useAuth();
+  const { address, isAuthenticated } = useAuth();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!address) {
+      setLoading(false);
+      return;
+    }
+    fetch(`/api/merchant/products?address=${address}`)
+      .then((r) => r.json())
+      .then((data) => {
+        setProducts(data.products || []);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [address]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -45,12 +66,48 @@ export default function MerchantDashboard() {
             </p>
             <MagicLoginButton />
           </div>
-        ) : (
+        ) : loading ? (
+          <div className="text-center py-16 text-muted-foreground">
+            Loading products...
+          </div>
+        ) : products.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
             <p>No products yet. Create your first checkout.</p>
             <Link href="/merchant/create">
               <Button className="mt-4">Create a Checkout</Button>
             </Link>
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {products.map((product) => (
+              <Card key={product.id}>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>{product.name}</span>
+                    <Badge variant="secondary">${product.price} USDC</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    {product.description}
+                  </p>
+                  <Separator />
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Slug</span>
+                    <code className="text-xs">{product.slug}</code>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Checkout link</span>
+                    <Link
+                      href={`/pay/${product.slug}`}
+                      className="text-primary hover:underline"
+                    >
+                      /pay/{product.slug}
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         )}
       </main>

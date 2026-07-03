@@ -1,3 +1,19 @@
+export interface Product {
+  id: string;
+  merchantAddress: string;
+  name: string;
+  price: string;
+  currency: string;
+  description: string | null;
+  settlementChain: string;
+  deliverable: string | null;
+  gatedContentTitle: string | null;
+  nftMetadata: Record<string, unknown> | null;
+  slug: string;
+  active: string | null;
+  createdAt: string;
+}
+
 export interface GeneratedProduct {
   name: string;
   price: string;
