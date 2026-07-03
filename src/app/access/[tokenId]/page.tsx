@@ -46,7 +46,7 @@ export default function AccessPage() {
         <div>
           <p className="text-sm text-muted-foreground text-center mb-6">
             Based on your interests, your builder kit includes a project
-            positioning, UI checklist, demo script, integration checklist, and
+            positioning, UI checklist, pitch script, integration checklist, and
             pitch summary.
           </p>
           <AIBuilderKitGenerator />

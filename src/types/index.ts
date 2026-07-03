@@ -24,7 +24,7 @@ export interface PaymentExplanation {
 
 export interface BuilderKit {
   projectPositioning: string;
-  bestDemoFlow: string[];
+  pitchFlow: string[];
   recommendedPitch: string;
   technicalChecklist: string[];
   uiChecklist: string[];

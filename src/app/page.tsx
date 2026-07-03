@@ -28,12 +28,7 @@ export default function LandingPage() {
             >
               Create a Checkout
             </Link>
-            <Link
-              href="/pay/demo"
-              className="inline-flex h-12 items-center justify-center rounded-lg border border-border px-8 text-sm font-medium hover:bg-muted transition-colors"
-            >
-              Try Buyer Demo
-            </Link>
+
           </div>
         </div>
 

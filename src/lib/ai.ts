@@ -81,12 +81,12 @@ Return valid JSON:
 
 const BUILDER_KIT_SYSTEM = `You are a builder kit generator for Chainless Checkout AI.
 Given the user's description of what they're building, generate a personalized builder kit.
-The kit should help them build and demo their hackathon project effectively.
+The kit should help them build and ship their project effectively.
 
 Return valid JSON:
 {
   "projectPositioning": "string (one sentence positioning)",
-  "bestDemoFlow": ["string", "string", "string", "string", "string"],
+  "pitchFlow": ["string", "string", "string", "string", "string"],
   "recommendedPitch": "string (2-3 sentences)",
   "technicalChecklist": ["string", "string", "string", "string", "string"],
   "uiChecklist": ["string", "string", "string", "string"],

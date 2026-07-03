@@ -95,9 +95,9 @@ export function AIBuilderKitGenerator() {
             <Separator />
 
             <div>
-              <h3 className="text-sm font-medium mb-2">Best demo flow</h3>
+              <h3 className="text-sm font-medium mb-2">Pitch flow</h3>
               <ol className="space-y-1">
-                {kit.bestDemoFlow.map((step, i) => (
+                {kit.pitchFlow.map((step, i) => (
                   <li key={i} className="text-sm text-muted-foreground flex gap-2">
                     <span className="font-medium text-foreground">
                       {i + 1}.

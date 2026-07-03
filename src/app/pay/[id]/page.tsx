@@ -25,28 +25,6 @@ export default function PayPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        if (id === "demo") {
-          setProduct({
-            name: "UXMaxx AI Builder Pass",
-            price: "2",
-            currency: "USDC",
-            settlementChain: "Arbitrum Sepolia",
-            description:
-              "Get access to a private AI-generated builder pack for your UXMaxx project. Pay from any supported chain.",
-            deliverable: "NFT_ACCESS_PASS",
-            gatedContentTitle: "Personalized Builder Kit",
-            nftMetadata: {
-              name: "UXMaxx AI Builder Pass",
-              description: "Access pass for Chainless Checkout AI",
-              attributes: [
-                { trait_type: "Type", value: "Builder Pass" },
-                { trait_type: "Settlement", value: "Arbitrum Sepolia" },
-              ],
-            },
-          });
-          return;
-        }
-
         const res = await fetch(`/api/checkout/resolve?slug=${id}`);
         if (!res.ok) throw new Error("Product not found");
         const data = await res.json();
