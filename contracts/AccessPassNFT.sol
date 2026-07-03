@@ -1,19 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.27;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract AccessPassNFT is
-  Initializable,
-  ERC721Upgradeable,
-  ERC721URIStorageUpgradeable,
-  AccessControlUpgradeable,
-  UUPSUpgradeable
-{
+contract AccessPassNFT is ERC721, ERC721URIStorage, AccessControl {
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
   uint256 private _nextTokenId;
   string private _baseTokenURI;
@@ -40,20 +32,11 @@ contract AccessPassNFT is
   event PassDeactivated(uint256 indexed tokenId);
   event BaseURIUpdated(string newBaseURI);
 
-  constructor() {
-    _disableInitializers();
-  }
-
-  function initialize(
+  constructor(
     address defaultAdmin,
     address minter,
     string memory baseURI
-  ) public initializer {
-    __ERC721_init("Chainless Access Pass", "CAP");
-    __ERC721URIStorage_init();
-    __AccessControl_init();
-    __UUPSUpgradeable_init();
-
+  ) ERC721("Chainless Access Pass", "CAP") {
     _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
     _grantRole(MINTER_ROLE, minter);
     _baseTokenURI = baseURI;
@@ -153,7 +136,7 @@ contract AccessPassNFT is
   )
     public
     view
-    override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
+    override(ERC721, ERC721URIStorage)
     returns (string memory)
   {
     return super.tokenURI(tokenId);
@@ -164,15 +147,11 @@ contract AccessPassNFT is
   )
     public
     view
-    override(ERC721Upgradeable, ERC721URIStorageUpgradeable, AccessControlUpgradeable)
+    override(ERC721, ERC721URIStorage, AccessControl)
     returns (bool)
   {
     return super.supportsInterface(interfaceId);
   }
-
-  function _authorizeUpgrade(
-    address newImplementation
-  ) internal override onlyRole(DEFAULT_ADMIN_ROLE) {}
 
   function totalSupply() external view returns (uint256) {
     return _nextTokenId;

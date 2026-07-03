@@ -1,11 +1,18 @@
-import { HardhatUserConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-toolbox";
-import "@nomicfoundation/hardhat-verify";
+import { defineConfig } from "hardhat/config";
+import hardhatVerify from "@nomicfoundation/hardhat-verify";
+import hardhatEthers from "@nomicfoundation/hardhat-ethers";
 import * as dotenv from "dotenv";
+import * as path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
+dotenv.config({ path: path.join(__dirname, "contracts", ".env") });
 
-const config: HardhatUserConfig = {
+export default defineConfig({
+  plugins: [hardhatEthers, hardhatVerify],
   solidity: {
     version: "0.8.27",
     settings: {
@@ -15,27 +22,27 @@ const config: HardhatUserConfig = {
   },
   networks: {
     arbitrumSepolia: {
-      url: "https://sepolia-rollup.arbitrum.io/rpc",
       chainId: 421614,
+      url: "https://sepolia-rollup.arbitrum.io/rpc",
       accounts: process.env.DEPLOYER_PRIVATE_KEY
         ? [process.env.DEPLOYER_PRIVATE_KEY]
         : [],
-      type: "http" as const,
+      type: "http",
     },
     baseSepolia: {
-      url: "https://sepolia.base.org",
       chainId: 84532,
+      url: "https://sepolia.base.org",
       accounts: process.env.DEPLOYER_PRIVATE_KEY
         ? [process.env.DEPLOYER_PRIVATE_KEY]
         : [],
-      type: "http" as const,
+      type: "http",
     },
   },
-  etherscan: {
-    apiKey: {
-      arbitrumSepolia: process.env.ARBISCAN_API_KEY || "",
+  verify: {
+    etherscan: {
+      apiKey: process.env.ARBISCAN_API_KEY
+        ? { arbitrumSepolia: process.env.ARBISCAN_API_KEY }
+        : undefined,
     },
   },
-};
-
-export default config;
+});
