@@ -39,16 +39,18 @@ export function MagicLoginButton() {
     const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
     return (
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Button variant="outline" className="gap-2">
-            <Avatar className="h-5 w-5">
-              <AvatarFallback className="text-xs">
-                {address.slice(2, 4).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            {shortAddress}
-          </Button>
-        </DropdownMenuTrigger>
+        <DropdownMenuTrigger
+          render={
+            <Button variant="outline" className="gap-2">
+              <Avatar className="h-5 w-5">
+                <AvatarFallback className="text-xs">
+                  {address.slice(2, 4).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              {shortAddress}
+            </Button>
+          }
+        />
         <DropdownMenuContent align="end">
           <DropdownMenuItem className="text-xs text-muted-foreground">
             Wallet ready
