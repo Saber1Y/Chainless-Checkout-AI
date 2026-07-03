@@ -20,6 +20,7 @@ const config: HardhatUserConfig = {
       accounts: process.env.DEPLOYER_PRIVATE_KEY
         ? [process.env.DEPLOYER_PRIVATE_KEY]
         : [],
+      type: "http" as const,
     },
     baseSepolia: {
       url: "https://sepolia.base.org",
@@ -27,6 +28,7 @@ const config: HardhatUserConfig = {
       accounts: process.env.DEPLOYER_PRIVATE_KEY
         ? [process.env.DEPLOYER_PRIVATE_KEY]
         : [],
+      type: "http" as const,
     },
   },
   etherscan: {

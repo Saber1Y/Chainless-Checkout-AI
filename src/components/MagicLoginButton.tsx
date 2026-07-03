@@ -32,7 +32,7 @@ export function MagicLoginButton() {
     const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
     return (
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger>
           <Button variant="outline" className="gap-2">
             <Avatar className="h-5 w-5">
               <AvatarFallback className="text-xs">

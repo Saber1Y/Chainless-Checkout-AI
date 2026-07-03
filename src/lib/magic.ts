@@ -33,8 +33,8 @@ export async function loginWithEmail(email: string) {
 export async function getWalletAddress(): Promise<string | null> {
   try {
     const magic = getMagic();
-    const info = await magic.wallet.getInfo();
-    return info.walletAddress || null;
+    const info = await magic.user.getInfo();
+    return info.publicAddress || null;
   } catch {
     return null;
   }
