@@ -6,6 +6,7 @@ import { ReceiptCard } from "@/components/ReceiptCard";
 import { AccessPassCard } from "@/components/AccessPassCard";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { IoCheckmark } from "react-icons/io5";
 
 export default function ReceiptPage() {
   const params = useParams();
@@ -46,7 +47,7 @@ export default function ReceiptPage() {
       <main className="flex-1 p-4 sm:p-6 max-w-lg mx-auto w-full space-y-8 pt-16">
         <div className="text-center">
           <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900 mb-4">
-            <span className="text-green-600 dark:text-green-400 text-xl">✓</span>
+            <IoCheckmark className="text-green-600 dark:text-green-400 text-xl" />
           </div>
           <h1 className="text-2xl font-bold">Payment complete</h1>
         </div>

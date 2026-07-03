@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import type { GeneratedProduct } from "@/types";
+import { IoCheckmark } from "react-icons/io5";
 
 interface Props {
   product: GeneratedProduct;
@@ -30,14 +31,14 @@ export function CheckoutProductCard({ product, onContinue, isLoading }: Props) {
           <p className="text-sm font-medium">Includes:</p>
           <ul className="text-sm space-y-1 text-muted-foreground">
             <li className="flex items-center gap-2">
-              <span className="text-green-500">✓</span> Arbitrum access pass
+              <IoCheckmark className="text-green-500 shrink-0" /> Arbitrum access pass
             </li>
             <li className="flex items-center gap-2">
-              <span className="text-green-500">✓</span>{" "}
+              <IoCheckmark className="text-green-500 shrink-0" />{" "}
               {product.gatedContentTitle}
             </li>
             <li className="flex items-center gap-2">
-              <span className="text-green-500">✓</span> Private resource page
+              <IoCheckmark className="text-green-500 shrink-0" /> Private resource page
             </li>
           </ul>
         </div>

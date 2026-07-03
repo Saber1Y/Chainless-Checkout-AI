@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { useStore } from "@/lib/store";
 import type { BuilderKit } from "@/types";
+import { IoCheckmark } from "react-icons/io5";
 
 export function AIBuilderKitGenerator() {
   const [goal, setGoal] = useState("");
@@ -129,7 +130,7 @@ export function AIBuilderKitGenerator() {
                       key={i}
                       className="text-sm text-muted-foreground flex gap-2"
                     >
-                      <span className="text-green-500">✓</span> {item}
+                      <IoCheckmark className="text-green-500 mt-0.5 shrink-0" /> {item}
                     </li>
                   ))}
                 </ul>
@@ -142,7 +143,7 @@ export function AIBuilderKitGenerator() {
                       key={i}
                       className="text-sm text-muted-foreground flex gap-2"
                     >
-                      <span className="text-green-500">✓</span> {item}
+                      <IoCheckmark className="text-green-500 mt-0.5 shrink-0" /> {item}
                     </li>
                   ))}
                 </ul>

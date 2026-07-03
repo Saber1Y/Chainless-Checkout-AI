@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { MagicLoginButton } from "@/components/MagicLoginButton";
+import { FaRobot } from "react-icons/fa";
+import { IoGlobeOutline, IoFlash } from "react-icons/io5";
 
 export default function LandingPage() {
   return (
@@ -35,33 +37,33 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-3 gap-6 mt-20 max-w-3xl w-full">
-          <div className="rounded-lg border p-6 text-center space-y-2">
-            <div className="text-2xl">🤖</div>
-            <h3 className="font-semibold">AI creates your checkout</h3>
-            <p className="text-sm text-muted-foreground">
-              Describe what you want to sell. AI generates the page, metadata,
-              and gated content.
-            </p>
+          <div className="grid sm:grid-cols-3 gap-6 mt-20 max-w-3xl w-full">
+            <div className="rounded-lg border p-6 text-center space-y-2">
+              <FaRobot className="text-2xl mx-auto text-muted-foreground" />
+              <h3 className="font-semibold">AI creates your checkout</h3>
+              <p className="text-sm text-muted-foreground">
+                Describe what you want to sell. AI generates the page, metadata,
+                and gated content.
+              </p>
+            </div>
+            <div className="rounded-lg border p-6 text-center space-y-2">
+              <IoGlobeOutline className="text-2xl mx-auto text-muted-foreground" />
+              <h3 className="font-semibold">
+                Particle UA handles payments
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Buyers pay from any chain. One balance, no bridging, no network
+                switching.
+              </p>
+            </div>
+            <div className="rounded-lg border p-6 text-center space-y-2">
+              <IoFlash className="text-2xl mx-auto text-muted-foreground" />
+              <h3 className="font-semibold">Arbitrum delivers</h3>
+              <p className="text-sm text-muted-foreground">
+                Settlement and NFT access passes minted on Arbitrum Sepolia.
+              </p>
+            </div>
           </div>
-          <div className="rounded-lg border p-6 text-center space-y-2">
-            <div className="text-2xl">🌐</div>
-            <h3 className="font-semibold">
-              Particle UA handles payments
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              Buyers pay from any chain. One balance, no bridging, no network
-              switching.
-            </p>
-          </div>
-          <div className="rounded-lg border p-6 text-center space-y-2">
-            <div className="text-2xl">⚡</div>
-            <h3 className="font-semibold">Arbitrum delivers</h3>
-            <p className="text-sm text-muted-foreground">
-              Settlement and NFT access passes minted on Arbitrum Sepolia.
-            </p>
-          </div>
-        </div>
       </main>
 
       <footer className="p-4 text-center text-xs text-muted-foreground">

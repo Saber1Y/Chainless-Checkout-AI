@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useStore } from "@/lib/store";
+import { IoCheckmark, IoClose } from "react-icons/io5";
 
 const DEFAULT_STEPS = [
   { label: "Magic wallet connected", status: "pending" },
@@ -42,7 +43,7 @@ export function PaymentProgressTimeline({ onComplete }: Props) {
               <div className="flex-shrink-0">
                 {step.status === "completed" ? (
                   <div className="h-6 w-6 rounded-full bg-green-500 flex items-center justify-center">
-                    <span className="text-white text-xs">✓</span>
+                    <IoCheckmark className="text-white text-xs" />
                   </div>
                 ) : step.status === "in_progress" ? (
                   <div className="h-6 w-6 rounded-full border-2 border-blue-500 animate-pulse flex items-center justify-center">
@@ -50,7 +51,7 @@ export function PaymentProgressTimeline({ onComplete }: Props) {
                   </div>
                 ) : step.status === "failed" ? (
                   <div className="h-6 w-6 rounded-full bg-red-500 flex items-center justify-center">
-                    <span className="text-white text-xs">✕</span>
+                    <IoClose className="text-white text-xs" />
                   </div>
                 ) : (
                   <div className="h-6 w-6 rounded-full border-2 border-muted" />
