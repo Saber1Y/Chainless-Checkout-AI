@@ -19,8 +19,8 @@ export function UniversalAccountStatus() {
       try {
         const assets = await getUnifiedBalance(address);
         setBalance(assets.totalAmountInUSD || "0");
-      } catch (e) {
-        console.error("Failed to fetch UA balance:", e);
+      } catch {
+        setBalance(null);
       } finally {
         setLoading(false);
       }
@@ -31,15 +31,19 @@ export function UniversalAccountStatus() {
 
   if (!isAuthenticated) return null;
 
+  const hasBalance = balance !== null && parseFloat(balance) > 0;
+
   return (
     <div className="flex items-center gap-2 text-sm">
-      <Badge variant="secondary" className="gap-1">
-        <span className="h-2 w-2 rounded-full bg-green-500" />
-        Universal Account active
+      <Badge variant={hasBalance ? "secondary" : "outline"} className="gap-1">
+        <span
+          className={`h-2 w-2 rounded-full ${hasBalance ? "bg-green-500" : "bg-yellow-500"}`}
+        />
+        {hasBalance ? "Universal Account active" : "UA not activated"}
       </Badge>
       {loading ? (
         <Skeleton className="h-4 w-20" />
-      ) : balance ? (
+      ) : hasBalance ? (
         <span className="text-muted-foreground">
           ~${parseFloat(balance).toFixed(2)} USD
         </span>

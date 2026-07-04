@@ -4,7 +4,7 @@ import { config } from "@/config";
 let uaInstance: UniversalAccount | null = null;
 
 export function getUniversalAccount(ownerAddress: string): UniversalAccount {
-  if (!uaInstance || uaInstance["ownerAddress"] !== ownerAddress) {
+  if (!uaInstance || (uaInstance as any)["ownerAddress"] !== ownerAddress) {
     uaInstance = new UniversalAccount({
       projectId: config.particle.projectId,
       projectClientKey: config.particle.clientKey,
