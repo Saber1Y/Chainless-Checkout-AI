@@ -53,7 +53,7 @@ export default function MerchantCreatePage() {
       }
 
       toast.success("Checkout link created!");
-      router.push(`/merchant`);
+      router.push(`/merchant/success/${slug}`);
     } catch (e: any) {
       toast.error(e.message);
     } finally {
