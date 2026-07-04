@@ -4,30 +4,20 @@ import { products, invoices } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { ethers } from "ethers";
 
-const PAYMENT_SETTLEMENT_ABI = [
-  "function receivePayment(address buyer, string calldata productId, uint256 amount) external returns (bytes32)",
-  "function merchant() external view returns (address)",
-];
-
 const ACCESS_PASS_NFT_ABI = [
   "function mintPassWithProduct(address to, uint256 passType, string memory productId, string memory metadataURI) external returns (uint256)",
   "function totalSupply() external view returns (uint256)",
 ];
 
-async function callWithDeployer<T>(
-  contractAddress: string,
-  abi: string[],
-  method: string,
-  args: unknown[]
-): Promise<T> {
+async function getArbitrumProvider() {
+  return new ethers.JsonRpcProvider("https://sepolia-rollup.arbitrum.io/rpc");
+}
+
+async function getDeployerWallet() {
   const pk = process.env.DEPLOYER_PRIVATE_KEY;
-  if (!pk) throw new Error("DEPLOYER_PRIVATE_KEY not set");
-
-  const provider = new ethers.JsonRpcProvider("https://sepolia-rollup.arbitrum.io/rpc");
-  const wallet = new ethers.Wallet(pk, provider);
-  const contract = new ethers.Contract(contractAddress, abi, wallet);
-
-  return contract[method](...args);
+  if (!pk) return null;
+  const provider = await getArbitrumProvider();
+  return new ethers.Wallet(pk, provider);
 }
 
 export async function POST(req: NextRequest) {
@@ -51,7 +41,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    const settlementAddress = process.env.NEXT_PUBLIC_PAYMENT_SETTLEMENT_ADDRESS || "";
     const nftAddress = process.env.NEXT_PUBLIC_ACCESS_PASS_NFT_ADDRESS || "";
 
     const [invoice] = await db
@@ -67,42 +56,36 @@ export async function POST(req: NextRequest) {
       })
       .returning();
 
-    let settlementTx: string | null = null;
     let nftTokenId: string | null = null;
     let processStatus = "pending";
 
     try {
-      const totalSupply = await callWithDeployer<bigint>(
-        nftAddress,
-        ACCESS_PASS_NFT_ABI,
-        "totalSupply",
-        []
-      );
-      const nextTokenId = Number(totalSupply) + 1;
-      const metadataURI = `https://chainless-checkout.vercel.app/api/metadata/${product.slug}`;
-
-      const tx = await callWithDeployer<ethers.TransactionResponse>(
-        nftAddress,
-        ACCESS_PASS_NFT_ABI,
-        "mintPassWithProduct",
-        [buyerAddress, nextTokenId, invoice.id, metadataURI]
-      );
-      const receipt = await tx.wait();
-      nftTokenId = String(nextTokenId);
-      settlementTx = receipt?.hash || null;
-      processStatus = "settled";
+      const wallet = await getDeployerWallet();
+      if (wallet) {
+        const nft = new ethers.Contract(nftAddress, ACCESS_PASS_NFT_ABI, wallet);
+        const totalSupply = await nft.totalSupply();
+        const nextId = Number(totalSupply) + 1;
+        const metadataURI = `https://chainless-checkout.vercel.app/api/metadata/${product.slug}`;
+        const tx = await nft.mintPassWithProduct(
+          buyerAddress,
+          nextId,
+          invoice.id,
+          metadataURI
+        );
+        const receipt = await tx.wait();
+        nftTokenId = String(nextId);
+        processStatus = "settled";
+      }
     } catch (e) {
-      console.warn("On-chain processing failed (demo mode):", e);
-      processStatus = "pending";
+      console.warn("NFT minting failed (demo mode — invoice still created):", e);
     }
 
     const [updated] = await db
       .update(invoices)
       .set({
         status: processStatus,
-        settlementTx,
         nftTokenId,
-        nftContractAddress: nftAddress,
+        nftContractAddress: nftAddress || null,
       })
       .where(eq(invoices.id, invoice.id))
       .returning();
