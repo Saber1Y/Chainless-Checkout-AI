@@ -19,6 +19,12 @@ export const config = {
     paymentSettlement: (process.env.NEXT_PUBLIC_PAYMENT_SETTLEMENT_ADDRESS || "") as `0x${string}`,
     accessPassNFT: (process.env.NEXT_PUBLIC_ACCESS_PASS_NFT_ADDRESS || "") as `0x${string}`,
   },
+  tokens: {
+    usdc: {
+      baseSepolia: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+      arbitrumSepolia: "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
+    },
+  },
   chains: {
     arbitrumSepolia: {
       id: 421614,
