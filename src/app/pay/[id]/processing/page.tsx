@@ -6,8 +6,8 @@ import Link from "next/link";
 import { PaymentProgressTimeline } from "@/components/PaymentProgressTimeline";
 import { useAuth } from "@/components/MagicAuthProvider";
 import { useStore } from "@/lib/store";
-import { signEIP7702Authorization } from "@/lib/magic";
-import { getUniversalAccount, getUnifiedBalance, createCrossChainPayment } from "@/lib/particle";
+import { getMagicSigner, signEIP7702Authorization } from "@/lib/magic";
+import { getUniversalAccount, getUnifiedBalance, getMerchantAddress, createCrossChainPayment } from "@/lib/particle";
 import { config } from "@/config";
 import type { Product } from "@/types";
 
@@ -17,19 +17,10 @@ export default function ProcessingPage() {
   const { address, isAuthenticated } = useAuth();
   const { updateStepStatus } = useStore();
   const slug = params.id as string;
-  const productRef = useRef<Product | null>(null);
   const startedRef = useRef(false);
 
-  const markFailed = useCallback((stepIndex: number) => {
-    updateStepStatus(stepIndex, "failed");
-  }, [updateStepStatus]);
-
-  const markCompleted = useCallback((stepIndex: number) => {
-    updateStepStatus(stepIndex, "completed");
-  }, [updateStepStatus]);
-
-  const markInProgress = useCallback((stepIndex: number) => {
-    updateStepStatus(stepIndex, "in_progress");
+  const mark = useCallback((index: number, status: string) => {
+    updateStepStatus(index, status);
   }, [updateStepStatus]);
 
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -39,84 +30,103 @@ export default function ProcessingPage() {
     startedRef.current = true;
 
     const run = async () => {
-      markInProgress(0);
+      mark(0, "in_progress");
 
       let product: Product | null = null;
-
       try {
         const res = await fetch(`/api/checkout/resolve?slug=${slug}`);
         if (!res.ok) throw new Error("Product not found");
         product = await res.json();
-        productRef.current = product;
-        markCompleted(0);
+        mark(0, "completed");
       } catch {
-        markFailed(0);
+        mark(0, "failed");
         return;
       }
 
       await sleep(300);
-      markInProgress(1);
+      mark(1, "in_progress");
 
+      let magicSigner: Awaited<ReturnType<typeof getMagicSigner>> | null = null;
       try {
-        const authSig = await signEIP7702Authorization(
-          config.contracts.paymentSettlement,
-          config.chains.arbitrumSepolia.id
-        );
-        markCompleted(1);
+        magicSigner = await getMagicSigner();
+        mark(1, "completed");
       } catch {
-        markFailed(1);
+        mark(1, "failed");
       }
 
       await sleep(300);
-      markInProgress(2);
+      mark(2, "in_progress");
 
       let balanceFound = false;
       try {
-        const ua = getUniversalAccount(address);
         const assets = await getUnifiedBalance(address);
         balanceFound = !!assets.totalAmountInUSD && parseFloat(assets.totalAmountInUSD) > 0;
-        markCompleted(2);
+        mark(2, "completed");
       } catch {
-        markCompleted(2);
+        mark(2, "completed");
       }
 
       await sleep(300);
-      markInProgress(3);
+      mark(3, "in_progress");
 
-      let isPending = false;
+      let paymentResult: { txHash?: string; error?: string } = {};
       try {
-        const merchantRes = await fetch("/api/checkout/process", {
+        const merchantAddr = await getMerchantAddress();
+        const ua = getUniversalAccount(address);
+        const tx = await ua.createTransferTransaction({
+          token: {
+            chainId: config.chains.baseSepolia.id,
+            address: config.tokens.usdc.baseSepolia,
+          },
+          amount: product!.price,
+          receiver: merchantAddr,
+        });
+        const signFn = async (hash: Uint8Array) => {
+          return magicSigner!.signMessage(hash);
+        };
+        const signature = await signFn(
+          new Uint8Array(Buffer.from(tx.rootHash.slice(2), "hex"))
+        );
+        const result = await ua.sendTransaction(tx, signature);
+        paymentResult.txHash = typeof result === "string" ? result : result.hash;
+        mark(3, "completed");
+      } catch (e: any) {
+        paymentResult.error = e.message;
+        mark(3, "failed");
+      }
+
+      await sleep(300);
+      mark(4, "in_progress");
+
+      try {
+        const res = await fetch("/api/checkout/process", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             productSlug: slug,
             buyerAddress: address,
             sourceChain: "Base Sepolia",
+            settlementTx: paymentResult.txHash,
           }),
         });
-        if (!merchantRes.ok) throw new Error("Processing failed");
-        const { invoice } = await merchantRes.json();
-        productRef.current = null;
-        markCompleted(3);
+        if (!res.ok) throw new Error("Processing failed");
+        const { invoice } = await res.json();
+        mark(4, "completed");
 
         await sleep(300);
-        markInProgress(4);
-        markCompleted(4);
-
-        await sleep(300);
-        markInProgress(5);
-        markCompleted(5);
+        mark(5, "in_progress");
+        mark(5, "completed");
 
         setTimeout(() => {
           router.push(`/receipt/${invoice.id}`);
         }, 800);
       } catch {
-        markFailed(3);
+        mark(4, "failed");
       }
     };
 
     run();
-  }, [address, isAuthenticated, slug, markInProgress, markCompleted, markFailed, router]);
+  }, [address, isAuthenticated, slug, mark, router]);
 
   return (
     <div className="min-h-screen flex flex-col">
