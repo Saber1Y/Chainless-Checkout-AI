@@ -38,7 +38,12 @@ async function callOpenRouter(systemPrompt: string, userMessage: string) {
     throw new Error("Empty response from OpenRouter");
   }
 
-  return JSON.parse(content);
+  const cleaned = content
+    .replace(/^```(?:json)?\s*/gm, "")
+    .replace(/\s*```$/gm, "")
+    .trim();
+
+  return JSON.parse(cleaned);
 }
 
 const PRODUCT_GENERATOR_SYSTEM = `You are a checkout generator for Chainless Checkout AI.
