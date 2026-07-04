@@ -1,4 +1,5 @@
 import { Magic } from "magic-sdk";
+import { ethers } from "ethers";
 import { config } from "@/config";
 
 let magicInstance: Magic | null = null;
@@ -67,4 +68,10 @@ export async function signEIP7702Authorization(
     contractAddress,
     chainId,
   });
+}
+
+export async function getMagicSigner() {
+  const magic = getMagic();
+  const provider = new ethers.BrowserProvider(magic.rpcProvider);
+  return provider.getSigner();
 }
